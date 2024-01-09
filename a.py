@@ -4,10 +4,9 @@ import pytesseract
 import os
 import openai
 
-# openai.api_key = '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'
-# openai.api_key = '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'
-# tut key
-openai.api_key = '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'
+# input your own api key, can't post onto github with my api key
+
+openai.api_key = ''
 
 app = Flask(__name__)
 
