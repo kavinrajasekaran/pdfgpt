@@ -1,0 +1,122 @@
+<!-- upload_form.html -->
+
+<head>
+    <title>LazyGPT</title>
+
+    <style>
+        /* Dark color palette */
+        :root {
+            --primary: #01031a;
+            --secondary: #01031a;
+            --accent: #6c63ff;
+        }
+
+        /* Basic page styles */
+        body {
+            background-color: var(--primary);
+            color: #fff;
+            font-family: Arial, sans-serif;
+            margin: 0;
+        }
+
+        nav {
+            background-color: var(--secondary);
+            text-align: left;
+        }
+
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            padding: 14px 20px;
+            display: inline-block;
+        }
+
+        main {
+            text-align: center;
+            margin-top: 100px;
+        }
+
+        h1 {
+            font-size: 48px;
+
+            /* Animated pulsating text */
+            animation: pulse 6s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                color: #6c63ff;
+                /* Purple */
+            }
+
+
+            50% {
+                color: #3da4ff;
+                /* Blue */
+            }
+
+            100% {
+                color: #6c63ff;
+                /* Back to Purple */
+            }
+        }
+
+        h3 {
+            font-size: 24px;
+
+            /* Animated pulsating text */
+            animation: pulse 6s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                color: #6c63ff;
+                /* Purple */
+            }
+
+
+            50% {
+                color: #3da4ff;
+                /* Blue */
+            }
+            100% {
+                color: #6c63ff;
+                /* Back to Purple */
+            }
+        }
+    </style>
+    
+    </head>
+    
+    <body>
+    
+        <main>
+            <h1>iAintReadingAllat
+                
+            </h1>
+    
+            <form method="POST" enctype="multipart/form-data">
+                <input type="file" name="file" accept="application/pdf">
+                <input type="submit" value="Upload">
+            </form>
+            {% if pdf_text %}
+            <hr>
+            <h2>Extracted Text</h2>
+            <pre>{{ pdf_text }}</pre>
+            {% endif %}
+    
+            {% if text %}
+            <div>
+                <p>{{ text }}</p>
+            </div>
+            {% endif %}
+    
+            {% if summarized_text %}
+            <hr>
+            <h2>Summarized Text</h2>
+            <pre>{{ summarized_text }}</pre>
+            {% endif %}
+    
+        </main>
+    
+    </body>
