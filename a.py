@@ -4,6 +4,7 @@ import pytesseract
 import cv2
 import os
 import openai
+import numpy as np  # Make sure this line is included
 from PIL import Image
 
 # ==========================
@@ -14,18 +15,46 @@ app = Flask(__name__)
 
 def preprocess_image(image_path):
     """Preprocess the image to enhance OCR accuracy."""
+    # Read image using OpenCV
     image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
-
-    # Resize image for better OCR accuracy
+    
+    # Resize to improve OCR accuracy
     scale_percent = 200  # Increase size by 200%
     width = int(image.shape[1] * scale_percent / 100)
     height = int(image.shape[0] * scale_percent / 100)
     image = cv2.resize(image, (width, height), interpolation=cv2.INTER_CUBIC)
+    
+    # Remove noise with a Gaussian Blur
+    image = cv2.GaussianBlur(image, (5, 5), 0)
+    
+    # Apply adaptive thresholding for better contrast
+    image = cv2.adaptiveThreshold(
+        image, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2
+    )
+    
+    # Deskew the image
+    coords = np.column_stack(np.where(image > 0))
+    angle = cv2.minAreaRect(coords)[-1]
+    if angle < -45:
+        angle = -(90 + angle)
+    else:
+        angle = -angle
 
-    # Apply adaptive thresholding for better text contrast
-    image = cv2.adaptiveThreshold(image, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
-                                  cv2.THRESH_BINARY, 11, 2)
-
+    # Rotate the image to deskew
+    (h, w) = image.shape[:2]
+    center = (w // 2, h // 2)
+    M = cv2.getRotationMatrix2D(center, angle, 1.0)
+    image = cv2.warpAffine(image, M, (w, h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
+    
+    # Sharpening the image using a kernel
+    kernel = np.array([[0, -1, 0], [-1, 5, -1], [0, -1, 0]])
+    image = cv2.filter2D(src=image, ddepth=-1, kernel=kernel)
+    
+    # Erosion and Dilation to remove noise further
+    kernel = np.ones((1, 1), np.uint8)
+    image = cv2.erode(image, kernel, iterations=1)
+    image = cv2.dilate(image, kernel, iterations=1)
+    
     # Save the processed image temporarily
     processed_image_path = "processed_temp.png"
     cv2.imwrite(processed_image_path, image)
